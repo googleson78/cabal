@@ -1,0 +1,44 @@
+load("@rules_haskell//haskell/experimental:defs.bzl", "haskell_module")
+load("@rules_haskell//haskell:defs.bzl", "haskell_library")
+load(
+    "@bazel_gazelle//:def.bzl",
+    "DEFAULT_LANGUAGES",
+    "gazelle",
+    "gazelle_binary",
+)
+
+# gazelle:resolve gazelle_cabal z @zlib.dev//:zlib
+gazelle(
+    name = "gazelle",
+    gazelle = ":gazelle_binary",
+)
+
+gazelle_binary(
+    name = "gazelle_binary",
+    languages = DEFAULT_LANGUAGES + ["@io_tweag_gazelle_cabal//gazelle_cabal"],
+)
+
+gazelle(
+    name = "gazelle_haskell_modules",
+    extra_args = [
+        "-lang",
+        "gazelle_haskell_modules",
+    ],
+    gazelle = ":gazelle_binary_haskell_modules",
+)
+
+gazelle_binary(
+    name = "gazelle_binary_haskell_modules",
+    languages = DEFAULT_LANGUAGES + ["@io_tweag_gazelle_haskell_modules//gazelle_haskell_modules"],
+)
+
+gazelle(
+    name = "gazelle-update-repos",
+    command = "update-repos",
+    extra_args = [
+        "-lang",
+        "gazelle_cabal",
+        "stackage",
+    ],
+    gazelle = ":gazelle_binary",
+)
